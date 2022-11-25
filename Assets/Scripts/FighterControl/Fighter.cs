@@ -79,6 +79,9 @@ public class Fighter : MonoBehaviour
 #region Gameplay
 
     int HP = 100;
+    [SerializeField]
+    FightManager fightManager;
+    bool leftFighter;
 
 #endregion
 
@@ -108,6 +111,8 @@ public class Fighter : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         spi = GetComponent<SpriteRenderer>();
         animator = gameObject.GetComponent<Animator>();
+        // check which side fighter starts on
+        leftFighter = (enemyFighter.GetPosition().x > transform.position.x);
     }
 
     private void Update() {
@@ -167,9 +172,9 @@ public class Fighter : MonoBehaviour
         // check position of enemy fighter, flip facing direction if not facing enemy
     }
 
+    // flip the sprite on it's x axis
     private void Flip() {
         spi.flipX = !spi.flipX;
-        Debug.Log("Flipped!");
     }
     
     private void MoveLeft() {
@@ -191,7 +196,6 @@ public class Fighter : MonoBehaviour
         // do a light attack
         animator.SetBool("LightAttack", true); // plays animation
         attackTimer = lightAttackTime;
-        Debug.Log("Light");
 
         Vector3 direction;
         if (facingRight) {
@@ -203,10 +207,9 @@ public class Fighter : MonoBehaviour
         }
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position + attackOffset, direction, lightAttackReach);
-        Debug.DrawRay(transform.position + attackOffset, direction * lightAttackReach, Color.red, lightAttackTime);
+        //Debug.DrawRay(transform.position + attackOffset, direction * lightAttackReach, Color.red, lightAttackTime);
 
         if (hit.collider != null) {
-            Debug.Log(gameObject.name + " Hit something: " + hit.collider.name);
             if (hit.collider.tag == "Fighter") {
                 enemyFighter.TakeDamage(lightAttackDamage);
             }
@@ -217,7 +220,6 @@ public class Fighter : MonoBehaviour
         // do a heavy attack
         animator.SetBool("HeavyAttack", true);
         attackTimer = heavyAttackTime;
-        Debug.Log("Heavy");
 
         // set the direction and add x offset depending on facing direction. x offset prevents raycast hitting own collider
         Vector3 direction;
@@ -230,13 +232,11 @@ public class Fighter : MonoBehaviour
         }
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position + attackOffset, direction, heavyAttackReach);
-        Debug.DrawRay(transform.position + attackOffset, direction * heavyAttackReach, Color.blue, heavyAttackTime);
+        //Debug.DrawRay(transform.position + attackOffset, direction * heavyAttackReach, Color.blue, heavyAttackTime);
 
         // if attack hits the enemy fighter, deal damage to them.
         if (hit.collider != null) {
-            Debug.Log(gameObject.name + " Hit something: " + hit.collider.name);
             if (hit.collider.tag == "Fighter" && hit.transform != transform) {
-                Debug.Log("Enemy Hit");
                 enemyFighter.TakeDamage(heavyAttackDamage);
             }
         }
@@ -256,6 +256,16 @@ public class Fighter : MonoBehaviour
         // take no damage if blocking
         if (!blocking) {
             animator.SetTrigger("Hurt");
+            HP -= dmg;
+            if (leftFighter) {
+                fightManager.TakeDamageLeft(dmg);
+            } else {
+                fightManager.TakeDamageRight(dmg);
+            }
+            if (HP < 1) {
+                fightManager.Winner();
+            }
+
         }
     }
 

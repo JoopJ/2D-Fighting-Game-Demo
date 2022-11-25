@@ -131,10 +131,11 @@ MonoBehaviour:
   pushBackForce: 0.3
   stunTime: 1
   stunTimer: 0
+  fightManager: {fileID: 0}
   lightAttackReach: 1.2
-  lightAttackDamage: 5
+  lightAttackDamage: 7
   heavyAttackReach: 1.5
-  heavyAttackDamage: 10
+  heavyAttackDamage: 14
   attackOffset: {x: 0, y: 0.75, z: 0}
   lightAttackTime: 0.4
   heavyAttackTime: 0.6
