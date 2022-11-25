@@ -127,9 +127,17 @@ MonoBehaviour:
   dragThreshold: 0.2
   dragToApply: 0
   jumpForce: 0.15
+  stompJumpForce: 7.5
   pushBackForce: 0.3
   stunTime: 1
   stunTimer: 0
+  lightAttackReach: 1.2
+  lightAttackDamage: 5
+  heavyAttackReach: 1.5
+  heavyAttackDamage: 10
+  attackOffset: {x: 0, y: 0.75, z: 0}
+  lightAttackTime: 0.4
+  heavyAttackTime: 0.6
 --- !u!114 &822458680973684968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,7 +201,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.85556936, y: 1.257263}
+  m_Size: {x: 0.85, y: 1.25}
   m_EdgeRadius: 0
 --- !u!95 &125832823694121677
 Animator:

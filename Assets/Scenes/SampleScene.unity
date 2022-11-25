@@ -395,6 +395,10 @@ PrefabInstance:
       value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 822458680973684969, guid: ecfae22acac41f74780779691476db2a, type: 3}
+      propertyPath: attackTime
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 822458680973684969, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: enemyFighter
       value: 
       objectReference: {fileID: 2006939933}
@@ -412,11 +416,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 822458680973684974, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: m_Color.g
-      value: 0
+      value: 0.08906451
       objectReference: {fileID: 0}
     - target: {fileID: 822458680973684974, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: m_Color.r
-      value: 0
+      value: 0.8301887
       objectReference: {fileID: 0}
     - target: {fileID: 822458680973684975, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: m_RootOrder
@@ -424,11 +428,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 822458680973684975, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.75
+      value: 5.33
       objectReference: {fileID: 0}
     - target: {fileID: 822458680973684975, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.17
+      value: -3.94
       objectReference: {fileID: 0}
     - target: {fileID: 822458680973684975, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -484,6 +488,10 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 822458680973684969, guid: ecfae22acac41f74780779691476db2a, type: 3}
+      propertyPath: attackTime
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 822458680973684969, guid: ecfae22acac41f74780779691476db2a, type: 3}
       propertyPath: enemyFighter
       value: 

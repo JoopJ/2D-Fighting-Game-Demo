@@ -33,6 +33,8 @@ public class Fighter : MonoBehaviour
 
     [SerializeField]
     float jumpForce =  0.2f;
+    [SerializeField]
+    float stompJumpForce = 7.5f;    // jump force when you land on enemies head
 
     private Vector3 velocity;
 
@@ -46,6 +48,9 @@ public class Fighter : MonoBehaviour
 
     bool grounded;
     bool enemyBodyCollision;
+    float colliderWidth = 0.85f;
+    float colliderHeight = 1.25f;
+    Vector3 enemyFighterPos;
 
 #endregion
 
@@ -71,6 +76,32 @@ public class Fighter : MonoBehaviour
 #endregion
 
 
+#region Gameplay
+
+    int HP = 100;
+
+#endregion
+
+#region Attacks
+    [SerializeField]
+    float lightAttackReach;
+    [SerializeField]
+    int lightAttackDamage = 5;
+    [SerializeField]
+    float heavyAttackReach;
+    [SerializeField]
+    int heavyAttackDamage = 10;
+    [SerializeField]
+    Vector3 attackOffset;
+    [SerializeField]
+    float lightAttackTime;
+    [SerializeField]
+    float heavyAttackTime;
+    float attackTimer = 0;
+
+#endregion
+
+
 
 
     private void Start() {
@@ -87,28 +118,53 @@ public class Fighter : MonoBehaviour
 
             if (fighterControl.jump && grounded) { Jump(); }
 
-            if (fighterControl.lightAttack) { LightAttack(); } else { animator.SetBool("LightAttack", false); }
-            if (fighterControl.heavyAttack) { HeavyAttack(); } else { animator.SetBool("HeavyAttack", false); }
+            if (fighterControl.lightAttack && attackTimer <= 0) { LightAttack(); } else { animator.SetBool("LightAttack", false); }
+            if (fighterControl.heavyAttack && attackTimer <= 0) { HeavyAttack(); } else { animator.SetBool("HeavyAttack", false); }
+            attackTimer -= Time.deltaTime;
 
-            // animate movement when moving in either direciton.
+            // animate movement when moving in either direction.
             if (left != right) { animator.SetBool("Moving", true); } else { animator.SetBool("Moving", false); }
         } else {
             left = false;
             right = false;
             stunTimer -= Time.deltaTime;
         }
+        // enemy position required for UpdatePosition
+        enemyFighterPos = enemyFighter.GetPosition();
         UpdatePosition();
-        // add a check for if the enemy changes side of fighter - make it flip the fighter
-        //      they are both making that same calculation so it could be done by one script and applied to both.
 
-        // face the fighter towards the enemy
-        if (enemyFighter.GetXPosition() > transform.position.x && !facingRight) {
+        // face the fighter towards the enemy 
+        if (enemyFighterPos.x > transform.position.x && !facingRight) {
             facingRight = true;
             Flip();
-        } else if (enemyFighter.GetXPosition() < transform.position.x && facingRight) { 
+        } else if (enemyFighterPos.x < transform.position.x && facingRight) { 
             facingRight = false;
             Flip();
         }
+    }
+
+        private void UpdatePosition() {
+        // greatly slow the fighter when not moving left or right
+        slowMultiplier = (left != right) ? 1 : 10;
+        // apply drag after a certain threshold velocity, so fighter can gain speed quickly
+        dragToApply = (Mathf.Abs(velocity.x) > dragThreshold || left == right) ? drag : 0;
+        
+        // clamp the Fighter to within the bounds of scene
+        velocity -= Vector3.ClampMagnitude(velocity, 1) * (dragToApply * slowMultiplier ) * Time.fixedDeltaTime;
+        transform.position += velocity * Time.fixedDeltaTime;
+        if (transform.position.x > sceneEdge) {
+            transform.position = new Vector3(sceneEdge, transform.position.y, transform.position.z);
+        }
+        else if (transform.position.x < -sceneEdge) {
+            transform.position = new Vector3(-sceneEdge, transform.position.y, transform.position.z);
+        } 
+
+        // push away from enemy when colliding.
+        if (enemyBodyCollision) {
+            rb.AddForce(new Vector3 (transform.position.x - enemyFighterPos.x, 0, 0) * pushBackForce);
+        }
+
+        // check position of enemy fighter, flip facing direction if not facing enemy
     }
 
     private void Flip() {
@@ -131,53 +187,80 @@ public class Fighter : MonoBehaviour
         animator.SetBool("Jumped", true);
     }
 
-    private void UpdatePosition() {
-        // greatly slow the fighter when not moving left or right
-        slowMultiplier = (left != right) ? 1 : 10;
-        // apply drag after a certain threshold velocity, so fighter can gain speed quickly
-        dragToApply = (Mathf.Abs(velocity.x) > dragThreshold || left == right) ? drag : 0;
-        
-        // clamp the Fighter to within the bounds of scene
-        velocity -= Vector3.ClampMagnitude(velocity, 1) * (dragToApply * slowMultiplier ) * Time.fixedDeltaTime;
-        transform.position += velocity * Time.fixedDeltaTime;
-        if (transform.position.x > sceneEdge) {
-            transform.position = new Vector3(sceneEdge, transform.position.y, transform.position.z);
-        }
-        else if (transform.position.x < -sceneEdge) {
-            transform.position = new Vector3(-sceneEdge, transform.position.y, transform.position.z);
-        } 
-
-        // push away from enemy when colliding.
-        if (enemyBodyCollision) {
-            rb.AddForce(new Vector3 (transform.position.x - enemyFighter.GetXPosition(), 0, 0) * pushBackForce);
-        }
-
-        // check position of enemy fighter, flip facing direciton if not facing enemy
-    }
-
     private void LightAttack() {
-        // do a light punch
+        // do a light attack
         animator.SetBool("LightAttack", true); // plays animation
+        attackTimer = lightAttackTime;
+        Debug.Log("Light");
 
+        Vector3 direction;
+        if (facingRight) {
+            direction = Vector3.right;
+            attackOffset.x = (colliderWidth/2 + 0.1f);
+        } else {
+            direction = Vector3.left;
+            attackOffset.x = -(colliderWidth/2 + 0.1f);
+        }
 
+        RaycastHit2D hit = Physics2D.Raycast(transform.position + attackOffset, direction, lightAttackReach);
+        Debug.DrawRay(transform.position + attackOffset, direction * lightAttackReach, Color.red, lightAttackTime);
 
+        if (hit.collider != null) {
+            Debug.Log(gameObject.name + " Hit something: " + hit.collider.name);
+            if (hit.collider.tag == "Fighter") {
+                enemyFighter.TakeDamage(lightAttackDamage);
+            }
+        }
     }
 
     private void HeavyAttack() {
-        // do a heavy kick
+        // do a heavy attack
         animator.SetBool("HeavyAttack", true);
+        attackTimer = heavyAttackTime;
+        Debug.Log("Heavy");
+
+        // set the direction and add x offset depending on facing direction. x offset prevents raycast hitting own collider
+        Vector3 direction;
+        if (facingRight) {
+            direction = Vector3.right;
+            attackOffset.x = (colliderWidth/2 + 0.1f);
+        } else {
+            direction = Vector3.left;
+            attackOffset.x = -(colliderWidth/2 + 0.1f);
+        }
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position + attackOffset, direction, heavyAttackReach);
+        Debug.DrawRay(transform.position + attackOffset, direction * heavyAttackReach, Color.blue, heavyAttackTime);
+
+        // if attack hits the enemy fighter, deal damage to them.
+        if (hit.collider != null) {
+            Debug.Log(gameObject.name + " Hit something: " + hit.collider.name);
+            if (hit.collider.tag == "Fighter" && hit.transform != transform) {
+                Debug.Log("Enemy Hit");
+                enemyFighter.TakeDamage(heavyAttackDamage);
+            }
+        }
     }
 
     private void Block() {
         // block, continue to block until you unblock
+        blocking = true;
     }
 
     private void Unblock() {
         // unblock if blocking
+        blocking = false;
     }
 
-    public float GetXPosition() {
-        return transform.position.x;
+    public void TakeDamage(int dmg) {
+        // take no damage if blocking
+        if (!blocking) {
+            animator.SetTrigger("Hurt");
+        }
+    }
+
+    public Vector3 GetPosition() {
+        return transform.position;
     }
 
     private void OnCollisionEnter2D(Collision2D col)
@@ -189,6 +272,18 @@ public class Fighter : MonoBehaviour
         
         if (col.gameObject.tag == "Fighter") {
             enemyBodyCollision = true;
+
+            enemyFighterPos = enemyFighter.GetPosition();
+            // check if the fighers are on top of each other
+            if (enemyFighterPos.x < transform.position.x + (colliderWidth) &&
+                enemyFighterPos.x > transform.position.x - (colliderWidth)) {
+                    Debug.Log("X positions line up.");
+                    // if this fighter is on top of enemy, jump and damage the enemy
+                    if (enemyFighterPos.y < transform.position.y) {
+                        rb.AddForce(Vector3.up * stompJumpForce, ForceMode2D.Impulse);
+                        enemyFighter.TakeDamage(5);
+                    }
+                }
         }
     }
 

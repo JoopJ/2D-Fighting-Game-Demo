@@ -121,8 +121,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.InternalAPIEditorBrid
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.VisualScripting.Shared.Editor", "Unity.VisualScripting.Shared.Editor.csproj", "{1829b29f-8c7d-0c35-fd9a-3b57ab9f4681}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor-firstpass.csproj", "{c39d90b0-0de9-4567-324e-c3998655fec4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -248,8 +246,6 @@ Global
 		{01152496-bcc3-cc21-e227-f0c36bdd9871}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1829b29f-8c7d-0c35-fd9a-3b57ab9f4681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1829b29f-8c7d-0c35-fd9a-3b57ab9f4681}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{c39d90b0-0de9-4567-324e-c3998655fec4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{c39d90b0-0de9-4567-324e-c3998655fec4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
