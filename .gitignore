@@ -1,0 +1,8 @@
+.vscode/
+Library/
+obj/
+Packages/
+Temp/
+Assets/Sprites/Hero Knight - Pixel Art/
+Assets/Plugins/
+*.meta
