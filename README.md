@@ -1,1 +1,2 @@
-"# 2D-Fighting-Game-Demo" 
+Play the game with Build/Shoote.exe
+
